@@ -4,6 +4,8 @@
 # via Ubuntu 20.04.x
 
 PHP_VERSION=7.3
+SITE_ROOT="mysite"
+
 
 echo "Setting up server enviornment for $PHP_VERSION"
 
@@ -19,11 +21,19 @@ sudo apt update
 sudo apt-get install -y php${PHP_VERSION} php${PHP_VERSION}-fpm php${PHP_VERSION}-mysql
 
 # Install MySQL server
-sudo apt-get install -y mysql-server
+#sudo apt-get install -y mysql-server
 
 # Secure the MySQL installation
-sudo mysql_secure_installation
+#sudo mysql_secure_installation
 
+
+# Install mariadb
+wget https://downloads.mariadb.com/MariaDB/mariadb_repo_setup 
+sudo chmod +x mariadb_repo_setup 
+sudo ./mariadb_repo_setup \ --mariadb-server-version="mariadb-10.5" $ sudo apt update
+sudo apt update
+
+sudo apt install mariadb-server mariadb-backup
 # Install nginx
 sudo apt-get install -y nginx
 
