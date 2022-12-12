@@ -1,0 +1,51 @@
+---
+- name: Stop MariaDB before removing anything else.
+  debug: Stopping MariaDB.
+  notify: stop mariadb
+  meta: flush_handlers
+
+# Run on Ubuntu only.
+- name: Remove MariaDB server on Ubuntu.
+  block:
+    - name: Remove MariaDB and dependencies.
+      apt:
+        name:
+          - mariadb-*
+          - galera*
+        state: absent
+        update_cache: yes
+
+    - name: Remove the MariaDB repo.
+      apt_repository:
+        repo: "{{ item }}"
+        state: absent
+      with_items:
+        - deb http://downloads.mariadb.com/MariaDB/mariadb-{{ mariadb_version }}/repo/ubuntu xenial main
+        - deb https://dlm.mariadb.com/repo/maxscale/latest/ubuntu xenial main
+        - deb http://downloads.mariadb.com/Tools/ubuntu xenial main
+  when: ansible_os_family == "Debian"
+  tags:
+    - ubuntu
+
+# Run on CentOS only.
+- name: Remove MariaDB server on CentOS.
+  block:
+    - name: Remove MariaDB server and dependencies.
+      yum:
+        name:
+          - mariadb-*
+          - galera*
+        state: absent
+        update_cache: yes
+
+    - name: Remove the MariaDB repo.
+      yum_repository:
+        name: "{{ item }}"
+        state: absent
+      with_items:
+        - mariadb-main
+        - mariadb-maxscale
+        - mariadb-tools
+  when: ansible_os_family == "RedHat"
+  tags:
+    - centos

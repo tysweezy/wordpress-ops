@@ -1,0 +1,54 @@
+---
+- name: Fetch the official MariaDB repo install script.
+  get_url:
+    url: https://downloads.mariadb.com/MariaDB/mariadb_repo_setup
+    dest: /tmp/mariadb_repo_setup
+
+- name: Add the offical MariaDB repos.
+  command:  bash /tmp/mariadb_repo_setup --mariadb-server-version="mariadb-{{ mariadb_version }}"
+
+# Run on Ubuntu only.
+- name: Install MariaDB server on Ubuntu.
+  block:
+    - name: Install MariaDB and dependencies.
+      apt:
+        name:
+          - mariadb-server
+          - libmariadbd-dev
+          - libmariadb3
+          - python-mysqldb
+          - python3-mysqldb
+          - mariadb-client
+          - libmysqlclient-dev
+          - galera*
+        state: present
+        update_cache: yes
+      notify: start mysql
+  when: ansible_os_family == "Debian"
+  tags:
+    - ubuntu
+
+# Run on CentOS only.
+- name: Install MariaDB server on CentOS.
+  block:
+    - name: Install Latest stable MariaDB version.
+      yum:
+        name:
+          - mariadb
+          - mariadb-server
+          - python36-mysql
+          - mysql-python
+          - mariadb-devel
+          - mariadb-libs
+          - galera*
+        state: present
+        update_cache: yes
+      notify: start mysql
+  when: ansible_os_family == "RedHat"
+  tags:
+    - centos
+
+- name: Remove the repo install script.
+  file:
+    path: /tmp/mariadb_repo_setup.sh
+    state: absent

@@ -1,0 +1,108 @@
+---
+# Run on Ubuntu only.
+- name: Install php7.x on Ubuntu.
+  block:
+    - name: Add the ppa:ondrej/php.
+      apt_repository:
+        repo: ppa:ondrej/php
+        state: present
+
+    - name: Install php7-fpm and dependencies.
+      apt:
+        name:
+          - php{{ php_version }}
+          - php{{ php_version }}-bcmath
+          - php{{ php_version }}-bz2
+          - php{{ php_version }}-cgi
+          - php{{ php_version }}-cli
+          - php{{ php_version }}-curl
+          - php{{ php_version }}-fpm
+          - php{{ php_version }}-gd
+          - php{{ php_version }}-intl
+          - php{{ php_version }}-json
+          - php{{ php_version }}-mbstring
+          - php{{ php_version }}-mysql
+          - php{{ php_version }}-readline
+          - php{{ php_version }}-soap
+          - php{{ php_version }}-xml
+          - php{{ php_version }}-xmlrpc
+          - php{{ php_version }}-zip
+          - php-pear
+          - autoconf
+          - automake
+          - libxml2-dev
+          - libcurl4-openssl-dev
+          - libssl-dev
+          - openssl
+          - gettext
+          - libicu-dev
+          - libmcrypt-dev
+          - libmcrypt4
+          - libbz2-dev
+          - libreadline-dev
+          - build-essential
+          - libmhash-dev
+          - libmhash2
+          - libxslt1-dev
+          - libsystemd-dev
+          - mcrypt
+        state: present
+        update_cache: yes
+      notify: start php{{ php_version }}-fpm
+  when: ansible_os_family == "Debian"
+  tags:
+    - ubuntu
+
+# Run on CentOS only.
+- name: Install php7.x on CentOS.
+  block:
+    - name: Disable any previous remi-php repo versions.
+      yum:
+        disablerepo: remi-php*
+
+    - name: Add the php remi repo via rpm.
+      yum:
+        name: http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+        state: present
+
+    - name: Set the correct php version from our var.
+      shell: echo {{ php_version }} | tr -d .
+      register: phprepo
+
+    - name: Install php7-fpm and dependencies.
+      yum:
+        name:
+          - php
+          - php-bcmath
+          - php-common
+          - php-fpm
+          - php-pear
+          - php-opcache
+          - php-mbstring
+          - php-cgi
+          - php-mcrypt
+          - php-cli
+          - php-gd
+          - php-curl
+          - php-mysql
+          - php-intl
+          - php-json
+          - php-soap
+          - php-xml
+          - php-xmlrpc
+          - automake
+          - autoconf
+          - libxml2-devel
+          - libcurl-devel
+          - libicu-devel
+          - libmcrypt-devel
+          - libxslt1-devel
+          - openssl-libs
+          - mcrypt
+        enablerepo: remi–php{{ php_repo.stdout }}
+        state: present
+        update_cache: yes
+      notify: start php{{ php_version }}-fpm
+  when: ansible_os_family == "RedHat"
+  tags:
+    - centos
