@@ -18,7 +18,8 @@ sudo add-apt-repository ppa:ondrej/php
 sudo apt update
 
 # Install PHP and necessary modules
-sudo apt-get install -y php${PHP_VERSION} php${PHP_VERSION}-fpm php${PHP_VERSION}-mysql
+sudo apt-get install -y php${PHP_VERSION} php${PHP_VERSION}-fpm php${PHP_VERSION}-mysql \ 
+	php${PHP_VERSION}-curl php${PHP_VERSION}-mbstring php${PHP_VERSION}-xml
 
 # Install MySQL server
 #sudo apt-get install -y mysql-server
